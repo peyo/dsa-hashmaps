@@ -6,13 +6,12 @@ class HashMap {
     this._deleted = 0;
   }
 
-  static _hashString(string) {
-    let hash = 5381;
-    for (let i = 0; i < string.length; i++) {
-      hash = (hash << 5) + hash + string.charCodeAt(i);
-      hash = hash & hash;
+  get(key) {
+    const index = this._findSlot(key);
+    if (this._hashTable[index] === undefined) {
+      throw new Error('Key error');
     }
-    return hash >>> 0;
+    return this._hashTable[index].value;
   }
 
   set(key, value) {
@@ -20,7 +19,7 @@ class HashMap {
     if (loadRatio > HashMap.MAX_LOAD_RATIO) {
       this._resize(this._capacity * HashMap.SIZE_RATIO);
     }
-    // Find the slot where this key should be in.
+    //Find the slot where this key should be in
     const index = this._findSlot(key);
 
     if (!this._hashTable[index]) {
@@ -60,14 +59,35 @@ class HashMap {
   _resize(size) {
     const oldSlots = this._hashTable;
     this._capacity = size;
-    // Reset the length - it will get rebuilt as you add the items back.
+    // Reset the length - it will get rebuilt as you add the items back
     this.length = 0;
+    this._deleted = 0;
     this._hashTable = [];
 
     for (const slot of oldSlots) {
-      if (slot !== undefined) {
+      if (slot !== undefined && !slot.DELETED) {
         this.set(slot.key, slot.value);
       }
     }
   }
+
+  static _hashString(string) {
+    let hash = 5381;
+    for (let i = 0; i < string.length; i++) {
+      //Bitwise left shift with 5 0s - this would be similar to
+      //hash*31, 31 being the decent prime number
+      //but bit shifting is a faster way to do this
+      //tradeoff is understandability
+      hash = (hash << 5) + hash + string.charCodeAt(i);
+      //converting hash to a 32 bit integer
+      hash = hash & hash;
+    }
+    //making sure hash is unsigned - meaning non-negtive number. 
+    return hash >>> 0;
+  }
 }
+
+HashMap.MAX_LOAD_RATIO = 0.5;
+HashMap.SIZE_RATIO = 3;
+
+module.exports = HashMap
