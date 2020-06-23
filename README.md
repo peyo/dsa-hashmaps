@@ -5,4 +5,4 @@
 3. Palindrome.js
 5. SeparateChaining.js
 6. QuestionsAndAnswers
-    - 1, 3, 5, 7
+   - 1, 3, 5, 7
