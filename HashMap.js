@@ -10,6 +10,10 @@ class HashMap {
     const index = this._findSlot(key);
     if (this._hashTable[index] === undefined) {
       throw new Error('Key error');
+    } else {
+      while (this._hashTable[index].key !== key) {
+        index++
+      }
     }
     return this._hashTable[index].value;
   }
@@ -19,15 +23,27 @@ class HashMap {
     if (loadRatio > HashMap.MAX_LOAD_RATIO) {
       this._resize(this._capacity * HashMap.SIZE_RATIO);
     }
-    //Find the slot where this key should be in
-    const index = this._findSlot(key);
+    // Find the slot where this key should be in
+    let index = this._findSlot(key);
 
     if (!this._hashTable[index]) {
       this.length++;
+
+      // Open addressing
+    } else {
+      while (this._hashTable[index] && this._hashTable[index].key !== key) {
+        index++
+      }
+      /* Sequence chaining
+      this._hashTable[index].value.push(key, value)
+      return
+      */
     }
     this._hashTable[index] = {
       key,
       value,
+      // Sequence chaining
+      //value: new LinkList(key, value),
       DELETED: false
     };
   }
